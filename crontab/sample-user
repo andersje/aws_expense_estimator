@@ -1,0 +1,9 @@
+# these are sample crontab entries for running the AWS cost estimator report.
+## feel free to append this entire file to the end of your crontab file.
+##
+## don't forget to set your report user name appropriately.
+##
+15 6 * * 3 /home/YOURREPORTUSER/bin/getbillingfile.sh > /dev/null 2>/dev/null
+35 6 * * 3 /home/YOURREPORTUSER/bin/csv_report_generator.pl > /home/YOURREPORTUSER/curr_estimated.csv
+50 6 * * 3 /home/YOURREPORTUSER/bin/mailit_attachment.bash
+## end AWS report estimator cron entries
