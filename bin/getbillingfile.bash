@@ -1,19 +1,22 @@
 #!/bin/bash
-export BUCKET=YOURBUCKETNAMEHERE
-export WORKDIR=/home/YOURHOMEDIRHERE
 
-## no changes necessary below this line
+## read in all variables from ~/.estimator.ini -- die if not found
 
-export TARGETFILE=$WORKDIR/billing.csv
-if [[ $1"x" == "x" ]]; then
-	echo "desired filename not set.  saving to billing.csv"
-else
-	TARGETFILE="$1"
+if [[ ! -f ~/.estimator.ini ]]; then
+	echo "Unable to read shared variables from ~/.estimator.ini.  Exiting."
+	exit 1
 fi
+
+. ~/.estimator.ini
 
 export datestamp=$(date +%Y-%m)
 
+if [[ ! -d $WORKDIR ]]; then
+	mkdir -p $WORKDIR || echo "could not make work directory, dying." && exit 1
+fi
+
 cd $WORKDIR
+
 export FILENAME=$(/usr/bin/s3ls $BUCKET | awk -F\| '{print $7}' | grep -v zip | grep -v "test-object" | awk '/csv/{print $NF}' | grep $datestamp | grep -v cost-alloc ) 
 
 echo "getting $BUCKET/$FILENAME and saving into $TARGETFILE"

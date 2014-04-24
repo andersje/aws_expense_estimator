@@ -5,16 +5,16 @@
 # copyright 2013, Andersand Corporation.  All rights reserved.
 # now handles leap year and hours-in-month calculations properly
 
-use Text::CSV
+use Text::CSV;
 
-my $homedir=/YOUR/HOMEDIR/MUST/GO/HERE
-
-## no changes needed below this line.
+if ($#ARGV ne "0") {
+	print "sorry, I only know how to handle one argument.  You have to tell me where to save the csv file.  Dying\n";
+	exit 1;
+} else { $filename=$ARGV[0]; }
 
 my @rows;
 my $csv = Text::CSV->new ( { binary=>0} ) # don't need binary because we won't have embedded newlines.
         or die "Cannot use CSV: ".Text::CSV->error_diag();
-my $filename="/$homedir/billing.csv";
 open my $fh, $filename or die "$filename: $!";
 
 my $DEBUG=0;

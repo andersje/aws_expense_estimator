@@ -20,32 +20,37 @@ There are several prerequisites packages to succesfully running this script.
 
 Next, you'll need to follow some configuration steps to get this working.
 
-0) create a dedicated user to run the report and mail it out.  I made one called "awsreporter", and didn't give it a pubkey OR a password, so it can't be logged into.  But it can run cronjobs.  In my mind, this is more intuitively obvious than having it run under root (which is more authority than ANY of these scripts need), or a regular user account (which you may wish to delete if that user leaves the company).
+0) you'll need to ensure you've got enhanced billing turned on in AWS, and set to save in a specific bucket.  See http://aws.amazon.com/about-aws/whats-new/2012/06/05/aws-billing-enables-enhanced-csv-reports-and-programmatic-access/ and http://docs.aws.amazon.com/awsaccountbilling/latest/about/programaccess.html  for more information.
 
-1) you'll need to ensure you've got enhanced billing turned on in AWS, and set to save in a specific bucket.  See http://aws.amazon.com/about-aws/whats-new/2012/06/05/aws-billing-enables-enhanced-csv-reports-and-programmatic-access/ and http://docs.aws.amazon.com/awsaccountbilling/latest/about/programaccess.html  for more information.
+1) create a dedicated user to run the report and mail it out.  I made one called "awsreporter", and didn't give it a pubkey OR a password, so it can't be logged into.  But it can run cronjobs.  In my mind, this is more intuitively obvious than having it run under root (which is more authority than ANY of these scripts need), or a regular user account (which you may wish to delete if that user leaves the company).
 
-2) login to your S3 bucket and ensure you can see that file.
+2) fire up a shell as your dedicated report user
 
-3) create your ~/.awssecret file, according to the format spelled out on timkay's page above.
+3) login to your S3 bucket and ensure you can see that file.
 
-3) test your awstool installation, and ensure you can list the contents of your bucket, and actually fetch the file
+4) create your ~/.awssecret file, according to the format spelled out on timkay's page above.
 
-4) Now, test the sendEmail program but sending yourself a message:
+5) test your awstool installation, and ensure you can list the contents of your bucket, and actually fetch the file
+
+6) Now, test the sendEmail program but sending yourself a message:
 
        sendEmail -f root@yourhostname -t targetemailaddress@yourdomain.com -u MyTestMessage -m "this is the message body" -s yourSMTPserver.yourdomain.com
 
-5) edit bin/getbillingfile.sh, set your homedirectory and your bucket name appropriately
+7) copy ini/estimator.dist to ~/.estimator.ini, and edit it appropriately.
 
-6) test bin/getbillingfile.sh, ensure it works.
+8) install the binaries:
+    cp -a bin ~/
 
-7) edit bin/csv_report_generator.pl, set your homedirectory.  That's all that needs to be changed
+9) test bin/report_wrapper.bash, ensure it actually works:
+    ~/bin/report_wrapper.bash
 
-8) test bin/csv_report_generator.pl, ensure it works.
+10) add the following cron entry to your report user's crontab:
+    15 06 * * 3  /path/to/report_wrapper.bash > /dev/null 2>/dev/null
 
-9) edit bin/mailit_attachment.sh, change those five variables.  
+    ## that'll cause it to run every wednesday, at 06:15 hours
 
-10) test bin/mailit_attachment.sh, ensure it actually works
+11) profit.
 
-11) following the example contained in crontab/sample-user, put cron entries in place.  Be sure to change YOURREPORTUSER to the actual name of your report user.
 
-12) profit.
+
+That should get you up and running.  As always, issues/bug reports are appreciated.  I might even add features if you need.  I just haven't thought of anything I really needed to add to this project.

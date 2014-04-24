@@ -1,19 +1,17 @@
 #!/bin/bash
 
-### these are the variables you need to change.  Yes, I should read from an ini file.  Maybe someday.
+## read in the user-edited variables from ~/.estimator.ini.  Die if not found
 
-HOMEDIR=/YOUR/HOMEDIR/MUST/GO/HERE
-ADMINEMAIL="YOURADDRESS@YOURDOMAIN.COM"
-TARGETS="ADDRESS_ONE@YOURDOMAIN.COM ADDRESS_TWO@YOURDOMAIN.COM ADDRESS_THREE@YOURDOMAIN.COM"
-FROMADDR="SENDERADDRESS@YOURDOMAIN.COM"
-MAIL_SERVER="YOURMAILSERVER.YOURDOMAIN.COM"
-COMPANYNAME="YOURCOMPANYNAME"
+if [[ ! -f ~/.estimator.ini ]]; then
+	echo "Unable to read shared variables from ~/.estimator.ini.  Exiting."
+	exit 1
+fi
 
-### You should not need to change anything below this line
+. ~/.estimator.ini
 
 
+SOURCEFILE=$WORKDIR/curr_estimated.csv
 ESTIMATED_COST=$(tail -1 $SOURCEFILE | awk -F, '{print $NF}' | sed -e 's/\"//g')
-SOURCEFILE=$HOMEDIR/curr_estimated.csv
 SUBJECT="projected amazon costs for current month ($ESTIMATED_COST)"
 BODY="At current, total estimated costs for this month are $ESTIMATED_COST.  For more details, open the attached csv file with excel."
 
