@@ -32,7 +32,7 @@ Next, you'll need to follow some configuration steps to get this working.
 
 4) Now, test the sendEmail program but sending yourself a message:
 
-       sendemail -f root@yourhostname -t targetemailaddress@yourdomain.com -u MyTestMessage -m "this is the message body" -s yourSMTPserver.yourdomain.com
+       sendEmail -f root@yourhostname -t targetemailaddress@yourdomain.com -u MyTestMessage -m "this is the message body" -s yourSMTPserver.yourdomain.com
 
 5) edit bin/getbillingfile.sh, set your homedirectory and your bucket name appropriately
 
