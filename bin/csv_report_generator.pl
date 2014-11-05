@@ -84,6 +84,7 @@ while (my $rows = <CSVFILE>) {
     $rows =~ s/,/|/g;
   }
   $rows =~ s/"//g;
+  $rows =~ s/,//g;#remove commas to avoid difficulties importing CSVs.
   @row = split /\|/, $rows;
   $category = $row[3];
   if ( ($category =~ /(payerlineitem|statementtotal)/i) ) {
