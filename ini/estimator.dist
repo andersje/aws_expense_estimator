@@ -12,3 +12,4 @@ export COMPANYNAME="YOURCOMPANYNAME"
 export TARGETFILE=$WORKDIR/billing.csv
 export CSV_TARGET=$WORKDIR/curr_estimated.csv
 export BINPATH=$WORKDIR/bin
+export REPORTFILE=$WORKDIR/last_report_mailing.log
