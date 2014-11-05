@@ -1,6 +1,4 @@
-#!/usr/bin/perl
-
-
+#!/usr/bin/perl 
 # hacked up perl script to estimate monthly charges off of an AWS account
 # copyright 2013, Andersand Corporation.  All rights reserved.
 
@@ -15,7 +13,8 @@ my $DEBUG=0;
 # set this to 1 to turn on debugging messages
 
 my $total_projected=0;
-# initialize total projected costs to zero
+my $total_fixed=0;
+# initialize total projected costs, and fixed costs to zero
 
 # print our header line for the report
 print "\"category\",\"detailed_item\",  \"charges to date\", \"estimated total monthly cost\"\n";
@@ -64,7 +63,6 @@ my $month=`date +%m`;
 my $MONTHLY_HOURS=&monthly_hours($month);
 # determine how many hours we expect to have in this month.
 
-
 ## now, we read in our CSV, line by line.
 ## we're really only interested in lines that are marked as 'payerlineitem'
 ##   or 'statementtotal'
@@ -72,45 +70,62 @@ my $MONTHLY_HOURS=&monthly_hours($month);
 ## perl starts counting fields at 0, which is the way it should be.
 
 ## I'm hoping the variable names tell you which field is which
+
+my $period_desc="";
 while (my $rows = <CSVFILE>) {
   ## amazon, you are inconsistent.  because you put commas INSIDE your fields, 
   # this script needs do a search-and-replace to replace all instances of
   # "," with pipes, then delete the remaining quotes.  Unless, of course,
   # it's the header line, then it just replaces all commas with |s
   my @row;
-  if ($rows =~ /Estimated/) {
-    $rows =~ s/","/|/g;
-  } else {
-    $rows =~ s/,/|/g;
-  }
+  $rows =~ s/, / /g; #commas followed by spaces are INSIDE fields, so
+    #we replace with a space, so the next few substitutions will work
+  # amazon puts commas in their numbers, to be more human readable.
+  # that is evil
+  $rows =~ s/,000/k/g;
+  $rows =~ s/,/|/g;
   $rows =~ s/"//g;
-  $rows =~ s/,//g;#remove commas to avoid difficulties importing CSVs.
   @row = split /\|/, $rows;
   $category = $row[3];
-  if ( ($category =~ /(payerlineitem|statementtotal)/i) ) {
+  if ( $category =~ /statementtotal/i) {
+      ## this is fun.  we can't just interpolate the amazon total, 
+      # because it will include fixed costs
+      # but all we REALLY care about is the detail_desc, because
+      # that can be used in our OWN total line.
+      $period_desc = $row[18];
+      $period_desc =~ s/Total statement/Total Projected statement/g;
+  } elsif  ($category =~ /(payerlineitem|statementtotal)/i)  {
     my $last=@row - 1;
     $amount = $row[$last];
     chomp $amount;
     $amount = sprintf("%.2f", $amount);
     $item_desc = $row[13];
     $detail_desc = $row[18];
-    $hours_used = $row[21];
-    if ($hours_used++ > 0) {
-      $average_hourly_cost = $amount/$num_hours_so_far;
-      #this is the secret sauce for the cost intepretation
-      # figure out how much we've spent so far, and 
-      # assume that our usage pattern will exactly match
-      # it going forward.
+    $reservation_type = $row[15];
+    my $temp = 0;
+    if (($detail_desc =~ /subscription/i) || ($reservation_type =~ /heavy/i )){
+      # this loop is for reservations and heavy utilization types -- both of those
+      # are simply fixed-cost items, so no need to interpolate
+      $temp = $amount;
+      $total_fixed += $amount;
     } else {
-      # if we haven't USED the service, we can't guess
-      # at a usage pattern.
-      $average_hourly_cost = "N/A";
+      $hours_used = $row[21];
+      if ($hours_used++ > 0) {
+        $average_hourly_cost = $amount/$num_hours_so_far;
+        #this is the secret sauce for the cost intepretation
+        # figure out how much we've spent so far, and 
+        # assume that our usage pattern will exactly match
+        # it going forward.
+      } else {
+        # if we haven't USED the service, we can't guess
+        # at a usage pattern.
+        $average_hourly_cost = "N/A";
+      }
+      $temp = $average_hourly_cost * $MONTHLY_HOURS;
     }
-    my $temp = $average_hourly_cost * $MONTHLY_HOURS;
 
-    # round off to only two decimal places.  We're not 
-    # de-orbiting a mars lander here, so we don't need super
-    # precision
+    # round off to only two decimal places.  We're not de-orbiting 
+    # a mars lander here, so we don't need super precision
     $projected_monthly_cost = sprintf("%.2f", $temp);
 
     if ($projected_monthly_cost > 0) {
@@ -120,16 +135,11 @@ while (my $rows = <CSVFILE>) {
 
     ## only display items for which we have a cost.
     if ($amount > 0) {
-      if ( $item_desc eq '' ) {
-        $item_desc = "TOTAL";
-        my $temp = ($amount/$num_hours_so_far) * $MONTHLY_HOURS;
-        $projected_monthly_cost = sprintf("%.2f", $temp);
-      }
       print "\"$item_desc\", \"$detail_desc\", \"\$" . $amount . "\", \"\$" . $projected_monthly_cost . "\" \n";
-
     }
   }
 }
+
 close CSVFILE;
-print "\"total projected costs\",\"\",\"\",\"\$" . $total_projected . "\"\n";
+print "\"Summary\",\"" . $period_desc . "\",\"\",\"\$" . $total_projected . "\"\n";
 ##print " (please note, projected costs assume that the usage patterns up to the current time will continue until the end of the month.)\n";
