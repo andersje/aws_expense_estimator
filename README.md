@@ -28,7 +28,7 @@ Next, you'll need to follow some configuration steps to get this working.
 
 5) test your awstool installation, and ensure you can list the contents of your bucket, and actually fetch the file
 
-6) Now, test the sendEmail program but sending yourself a message:
+6) Now, test the sendEmail program by sending yourself a message:
 
        sendEmail -f root@yourhostname -t targetemailaddress@yourdomain.com -u MyTestMessage -m "this is the message body" -s yourSMTPserver.yourdomain.com
 
@@ -36,16 +36,16 @@ Next, you'll need to follow some configuration steps to get this working.
 
 8) install the binaries:
 
-    cp -a bin ~/
+       cp -a bin ~/
 
 9) test bin/report_wrapper.bash, ensure it actually works:
 
-    ~/bin/report_wrapper.bash
+       ~/bin/report_wrapper.bash
 
 10) add the following cron entry to your report user's crontab:
 
-    15 06 * * 3  /path/to/report_wrapper.bash > /dev/null 2>/dev/null 
-    ## that'll cause it to run every wednesday, at 06:15 hours
+       15 06 * * 3  /path/to/report_wrapper.bash > /dev/null 2>/dev/null 
+       ## that'll cause it to run every wednesday, at 06:15 hours
 
 11) profit.
 
