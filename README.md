@@ -5,7 +5,7 @@ A perl script intended to predict month-end AWS computing costs by extrapolating
 
 This code is distributed under the GPLv3.  All copyrights held by Andersand Corporation, but honestly, I don't know why you'd want to pirate this anyway. 
 
-There are several prerequisites packages to succesfully running this script.
+There are two prerequisites packages to succesfully running this script.
 
 0) Tim Kay's AWS tools
    These can be obtained from http://timkay.com/aws/ -- simply follow his instructions, to get this script
@@ -13,10 +13,6 @@ There are several prerequisites packages to succesfully running this script.
 1) the sendEmail command
    On Ubuntu, you can get this with:
       sudo apt-get install sendemail
-
-2) the perl text-csv library
-   You can install via CPAN or, on Ubuntu, you can get this via apt-get:
-      sudo apt-get install libtext-csv-encoded-perl
 
 Next, you'll need to follow some configuration steps to get this working.
 
