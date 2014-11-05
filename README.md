@@ -35,14 +35,16 @@ Next, you'll need to follow some configuration steps to get this working.
 7) copy ini/estimator.dist to ~/.estimator.ini, and edit it appropriately.
 
 8) install the binaries:
+
     cp -a bin ~/
 
 9) test bin/report_wrapper.bash, ensure it actually works:
+
     ~/bin/report_wrapper.bash
 
 10) add the following cron entry to your report user's crontab:
-    15 06 * * 3  /path/to/report_wrapper.bash > /dev/null 2>/dev/null
 
+    15 06 * * 3  /path/to/report_wrapper.bash > /dev/null 2>/dev/null 
     ## that'll cause it to run every wednesday, at 06:15 hours
 
 11) profit.
