@@ -17,7 +17,7 @@ my $total_fixed=0;
 # initialize total projected costs, and fixed costs to zero
 
 # print our header line for the report
-print "\"category\",\"detailed_item\",  \"charges to date\", \"estimated total monthly cost\"\n";
+print "category,detailed item description, charges to date, estimated total monthly cost\n";
 ## field number 19 is desc? -- see code which reads it in later
 ## field 22 is how many hours we've used it
 
@@ -135,11 +135,11 @@ while (my $rows = <CSVFILE>) {
 
     ## only display items for which we have a cost.
     if ($amount > 0) {
-      print "\"$item_desc\", \"$detail_desc\", \"\$" . $amount . "\", \"\$" . $projected_monthly_cost . "\" \n";
+      print $item_desc . "," . $detail_desc . ",\$" . $amount . ",\$" . $projected_monthly_cost . "\n";
     }
   }
 }
 
 close CSVFILE;
-print "\"Summary\",\"" . $period_desc . "\",\"\",\"\$" . $total_projected . "\"\n";
+print "Summary," . $period_desc . ",,\$" . $total_projected . "\n";
 ##print " (please note, projected costs assume that the usage patterns up to the current time will continue until the end of the month.)\n";
